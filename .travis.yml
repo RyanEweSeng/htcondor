@@ -70,7 +70,7 @@ before_install:
     - |
       if [[ -z $DOCKER_IMAGE && $TRAVIS_OS_NAME != osx ]]; then
         sudo apt-get install -y --no-install-recommends  \
-          chrpath cmake default-jdk gfortran libglobus-common-dev help2man \
+          chrpath cmake default-jdk gfortran globus-core help2man \
           libboost-filesystem-dev libboost-program-options-dev  \
           libboost-python-dev libboost-regex-dev libboost-system-dev  \
           libboost-test-dev libboost-thread-dev libcgroup-dev  \
