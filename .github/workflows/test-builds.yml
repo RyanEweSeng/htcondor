@@ -9,90 +9,83 @@ on:
 jobs:
   macos-build:
     runs-on: macos-latest
+    strategy:
+      matrix:
+        include:
+          - uw_build: ON
+            proper: OFF
+            voms: ON
+            globus: ON
+            scitokens: OFF
+          - uw_build: OFF
+            proper: ON
+            voms: OFF
+            globus: OFF
+            scitokens: OFF
     steps:
-    - uses: actions/checkout@v2
+      - uses: actions/checkout@v2
 
-    - name: MacOS build with UW_BUILD
-      env:
-        UW_BUILD: ON
-        PROPER: OFF
-        VOMS: ON
-        GLOBUS: ON
-        SCITOKENS: OFF
-      run: |
-        sudo mkdir -p /etc/default && sudo touch /etc/default/docker
-        echo 'DOCKER_OPTS="-H tcp://127.0.0.1:2375 -H unix:///var/run/docker.sock -s devicemapper"' | sudo tee /etc/default/docker > /dev/null
-
-    - name: MacOS build without UW_BUILD
-      env:
-        UW_BUILD: OFF
-        PROPER: ON
-        VOMS: OFF
-        GLOBUS: OFF
-        SCITOKENS: OFF
-      run: |
-        sudo mkdir -p /etc/default && sudo touch /etc/default/docker
-        echo 'DOCKER_OPTS="-H tcp://127.0.0.1:2375 -H unix:///var/run/docker.sock -s devicemapper"' | sudo tee /etc/default/docker > /dev/null
+      - name: MacOS build CI
+        env:
+          UW_BUILD: ${{ matrix.uw_build }}
+          PROPER: ${{ matrix.proper }}
+          VOMS: ${{ matrix.voms }}
+          GLOBUS: ${{ matrix.globus }}
+          SCITOKENS: ${{ matrix.scitokens }}
+        run: |
+          sudo mkdir -p /etc/default && sudo touch /etc/default/docker
+          echo 'DOCKER_OPTS="-H tcp://127.0.0.1:2375 -H unix:///var/run/docker.sock -s devicemapper"' | sudo tee /etc/default/docker > /dev/null
 
   linux-build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - uw_build: ON
+            proper: OFF
+            voms: ON
+            globus: ON
+            scitokens: ON
+          - uw_build: OFF
+            proper: ON
+            voms: ON
+            globus: ON
+            scitokens: OFF
     steps:
-    - uses: actions/checkout@v2
+      - uses: actions/checkout@v2
 
-    - name: Linux build CI with UW_BUILD
-      env:
-        UW_BUILD: ON
-        PROPER: OFF
-        VOMS: ON
-        GLOBUS: ON
-        SCITOKENS: ON
-      run: |
-        sudo apt-get install -y --no-install-recommends  \
-          chrpath cmake default-jdk gfortran help2man \
-          libboost-filesystem-dev libboost-program-options-dev  \
-          libboost-python-dev libboost-regex-dev libboost-system-dev  \
-          libboost-test-dev libboost-thread-dev libcgroup-dev  \
-          libcurl4-openssl-dev libglobus-common-dev libglobus-ftp-client-dev  \
-          libglobus-gass-server-ez-dev libglobus-gram-client-dev  \
-          libglobus-gram-protocol-dev libglobus-gss-assist-dev libmunge-dev  \
-          libpq-dev libvirt-dev libxml2-dev po-debconf \
-          libc-ares-dev voms-dev libtool-bin uuid-dev
-        sudo mkdir -p /etc/default && sudo touch /etc/default/docker
-        echo 'DOCKER_OPTS="-H tcp://127.0.0.1:2375 -H unix:///var/run/docker.sock -s devicemapper"' | sudo tee /etc/default/docker > /dev/null
+      - name: Linux build CI
+        env:
+            UW_BUILD: ${{ matrix.uw_build }}
+            PROPER: ${{ matrix.proper }}
+            VOMS: ${{ matrix.voms }}
+            GLOBUS: ${{ matrix.globus }}
+            SCITOKENS: ${{ matrix.scitokens }}
+        run: |
+          sudo apt-get install -y --no-install-recommends  \
+            chrpath cmake default-jdk gfortran help2man \
+            libboost-filesystem-dev libboost-program-options-dev  \
+            libboost-python-dev libboost-regex-dev libboost-system-dev  \
+            libboost-test-dev libboost-thread-dev libcgroup-dev  \
+            libcurl4-openssl-dev libglobus-common-dev libglobus-ftp-client-dev  \
+            libglobus-gass-server-ez-dev libglobus-gram-client-dev  \
+            libglobus-gram-protocol-dev libglobus-gss-assist-dev libmunge-dev  \
+            libpq-dev libvirt-dev libxml2-dev po-debconf \
+            libc-ares-dev voms-dev libtool-bin uuid-dev
+          sudo mkdir -p /etc/default && sudo touch /etc/default/docker
+          echo 'DOCKER_OPTS="-H tcp://127.0.0.1:2375 -H unix:///var/run/docker.sock -s devicemapper"' | sudo tee /etc/default/docker > /dev/null
 
-    - name: Linux build CI without UW_BUILD
-      env:
-        UW_BUILD: OFF
-        PROPER: ON
-        VOMS: ON
-        GLOBUS: ON
-        SCITOKENS: OFF
-      run: |
-        sudo apt-get install -y --no-install-recommends  \
-          chrpath cmake default-jdk gfortran help2man \
-          libboost-filesystem-dev libboost-program-options-dev  \
-          libboost-python-dev libboost-regex-dev libboost-system-dev  \
-          libboost-test-dev libboost-thread-dev libcgroup-dev  \
-          libcurl4-openssl-dev libglobus-common-dev libglobus-ftp-client-dev  \
-          libglobus-gass-server-ez-dev libglobus-gram-client-dev  \
-          libglobus-gram-protocol-dev libglobus-gss-assist-dev libmunge-dev  \
-          libpq-dev libvirt-dev libxml2-dev po-debconf \
-          libc-ares-dev voms-dev libtool-bin uuid-dev
-        sudo mkdir -p /etc/default && sudo touch /etc/default/docker
-        echo 'DOCKER_OPTS="-H tcp://127.0.0.1:2375 -H unix:///var/run/docker.sock -s devicemapper"' | sudo tee /etc/default/docker > /dev/null
-
-    - name: CentOS 7 build CI
-      env:
-        UW_BUILD: ON
-        PROPER: OFF
-        VOMS: ON
-        GLOBUS: ON
-        SCITOKENS: ON
-        DOCKER_IMAGE: centos:centos7
-      run: |
-        sudo mkdir -p /etc/default && sudo touch /etc/default/docker
-        echo 'DOCKER_OPTS="-H tcp://127.0.0.1:2375 -H unix:///var/run/docker.sock -s devicemapper"' | sudo tee /etc/default/docker > /dev/null
-        PLATFORM=centos7
-        docker pull htcondor/build-$PLATFORM
-        docker run --name $GITHUB_SHA --rm --mount type=bind,source="$PWD",target=/home/build/htcondor,readonly htcondor/build-$PLATFORM
-        docker exec $GITHUB_SHA /bin/bash
+      - name: CentOS 7 build CI
+        env:
+          UW_BUILD: ON
+          PROPER: OFF
+          VOMS: ON
+          GLOBUS: ON
+          SCITOKENS: ON
+          DOCKER_IMAGE: centos:centos7
+        run: |
+          sudo mkdir -p /etc/default && sudo touch /etc/default/docker
+          echo 'DOCKER_OPTS="-H tcp://127.0.0.1:2375 -H unix:///var/run/docker.sock -s devicemapper"' | sudo tee /etc/default/docker > /dev/null
+          sudo service docker restart
+          sleep 5
+          sudo docker pull $DOCKER_IMAGE
