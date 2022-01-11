@@ -15,7 +15,7 @@ jobs:
 
       - name: Start CentOS 7 image
         run: |
-          docker run --privilege --detach \
+          docker run --privileged --detach \
             --name $GITHUB_SHA \
             htcondor/nmi-zdev:x86_64_CentOS7-09010300
       
