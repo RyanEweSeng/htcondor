@@ -15,19 +15,30 @@ jobs:
 
       - name: Start CentOS 7 image
         run: |
-          docker run -i htcondor/nmi-zdev:x86_64_CentOS7-09010300 &&
-          su - condorauto
+          docker run --privilege --detach \
+            --name $GITHUB_SHA \
+            htcondor/nmi-zdev:x86_64_CentOS7-09010300
+      
+      - name: Switch to condorauto user account
+        run: |
+          docker exec $GITHUB_SHA \
+            /bin/bash -xc \
+              "su - condorauto"
 
       - name: Fetch sources
         run: |
-          git clone https://github.com/htcondor/htcondor.git
+          docker exec $GITHUB_SHA \
+            /bin/bash -xc \
+              "git clone https://github.com/htcondor/htcondor.git"
       
       - name: Build packages and extract tarballs
         run: |
-          mkdir work &&
-          cd work &&
-          ../htcondor/build-on-linux.sh ../htcondor &&
-          ../htcondor/nmi_tools/glue/build/make-tarball-from-rpms .
+          docker exec $GITHUB_SHA \
+            /bin/bash -xc \
+              "mkdir work &&
+              cd work &&
+              ../htcondor/build-on-linux.sh ../htcondor &&
+              ../htcondor/nmi_tools/glue/build/make-tarball-from-rpms ."
 
       - name: CentOS 7 build CI
         env:
