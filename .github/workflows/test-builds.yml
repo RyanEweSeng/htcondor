@@ -48,3 +48,4 @@ jobs:
           sudo service docker restart
           sleep 5
           sudo docker pull $DOCKER_IMAGE
+
